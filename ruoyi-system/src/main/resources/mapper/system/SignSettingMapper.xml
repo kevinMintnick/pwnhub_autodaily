@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SignSettingMapper">
+    
+    <resultMap type="SignSetting" id="SignSettingResult">
+        <result property="settingName"    column="setting_name"    />
+        <result property="settingValue"    column="setting_value"    />
+        <result property="settingExplain"    column="setting_explain"    />
+    </resultMap>
+
+    <sql id="selectSignSettingVo">
+        select setting_name, setting_value, setting_explain from sign_setting
+    </sql>
+
+    <select id="selectSignSettingList" parameterType="SignSetting" resultMap="SignSettingResult">
+        <include refid="selectSignSettingVo"/>
+        <where>  
+            <if test="settingName != null  and settingName != ''"> and setting_name like concat('%', #{settingName}, '%')</if>
+            <if test="settingValue != null  and settingValue != ''"> and setting_value = #{settingValue}</if>
+            <if test="settingExplain != null  and settingExplain != ''"> and setting_explain = #{settingExplain}</if>
+        </where>
+    </select>
+    
+    <select id="selectSignSettingById" parameterType="String" resultMap="SignSettingResult">
+        <include refid="selectSignSettingVo"/>
+        where setting_name = #{settingName}
+    </select>
+        
+    <insert id="insertSignSetting" parameterType="SignSetting">
+        insert into sign_setting
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="settingName != null">setting_name,</if>
+            <if test="settingValue != null and settingValue != ''">setting_value,</if>
+            <if test="settingExplain != null and settingExplain != ''">setting_explain,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="settingName != null">#{settingName},</if>
+            <if test="settingValue != null and settingValue != ''">#{settingValue},</if>
+            <if test="settingExplain != null and settingExplain != ''">#{settingExplain},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSignSetting" parameterType="SignSetting">
+        update sign_setting
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="settingValue != null and settingValue != ''">setting_value = #{settingValue},</if>
+            <if test="settingExplain != null and settingExplain != ''">setting_explain = #{settingExplain},</if>
+        </trim>
+        where setting_name = #{settingName}
+    </update>
+
+    <delete id="deleteSignSettingById" parameterType="String">
+        delete from sign_setting where setting_name = #{settingName}
+    </delete>
+
+    <delete id="deleteSignSettingByIds" parameterType="String">
+        delete from sign_setting where setting_name in 
+        <foreach item="settingName" collection="array" open="(" separator="," close=")">
+            #{settingName}
+        </foreach>
+    </delete>
+
+</mapper>

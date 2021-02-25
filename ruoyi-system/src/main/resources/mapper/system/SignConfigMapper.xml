@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SignConfigMapper">
+    
+    <resultMap type="SignConfig" id="SignConfigResult">
+        <result property="configId"    column="config_id"    />
+        <result property="stuNumber"    column="stuNumber"    />
+        <result property="stuSystemId"    column="stuSystemId"    />
+        <result property="stuName"    column="stuName"    />
+        <result property="stuClass"    column="stuClass"    />
+        <result property="stuUUID"    column="stuUUID"    />
+        <result property="stuToken"    column="stuToken"    />
+    </resultMap>
+
+    <sql id="selectSignConfigVo">
+        select config_id, stuNumber, stuSystemId, stuName, stuClass, stuUUID, stuToken from sign_config
+    </sql>
+
+    <select id="selectSignConfigList" parameterType="SignConfig" resultMap="SignConfigResult">
+        <include refid="selectSignConfigVo"/>
+        <where>  
+            <if test="configId != null "> and config_id = #{configId}</if>
+            <if test="stuNumber != null "> and stuNumber = #{stuNumber}</if>
+            <if test="stuSystemId != null  and stuSystemId != ''"> and stuSystemId = #{stuSystemId}</if>
+            <if test="stuName != null  and stuName != ''"> and stuName like concat('%', #{stuName}, '%')</if>
+            <if test="stuClass != null  and stuClass != ''"> and stuClass = #{stuClass}</if>
+            <if test="stuUUID != null  and stuUUID != ''"> and stuUUID = #{stuUUID}</if>
+            <if test="stuToken != null  and stuToken != ''"> and stuToken = #{stuToken}</if>
+        </where>
+    </select>
+    
+    <select id="selectSignConfigById" parameterType="Long" resultMap="SignConfigResult">
+        <include refid="selectSignConfigVo"/>
+        where config_id = #{configId}
+    </select>
+        
+    <insert id="insertSignConfig" parameterType="SignConfig" useGeneratedKeys="true" keyProperty="configId">
+        insert into sign_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuNumber != null">stuNumber,</if>
+            <if test="stuSystemId != null">stuSystemId,</if>
+            <if test="stuName != null">stuName,</if>
+            <if test="stuClass != null">stuClass,</if>
+            <if test="stuUUID != null">stuUUID,</if>
+            <if test="stuToken != null">stuToken,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stuNumber != null">#{stuNumber},</if>
+            <if test="stuSystemId != null">#{stuSystemId},</if>
+            <if test="stuName != null">#{stuName},</if>
+            <if test="stuClass != null">#{stuClass},</if>
+            <if test="stuUUID != null">#{stuUUID},</if>
+            <if test="stuToken != null">#{stuToken},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSignConfig" parameterType="SignConfig">
+        update sign_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stuNumber != null">stuNumber = #{stuNumber},</if>
+            <if test="stuSystemId != null">stuSystemId = #{stuSystemId},</if>
+            <if test="stuName != null">stuName = #{stuName},</if>
+            <if test="stuClass != null">stuClass = #{stuClass},</if>
+            <if test="stuUUID != null">stuUUID = #{stuUUID},</if>
+            <if test="stuToken != null">stuToken = #{stuToken},</if>
+        </trim>
+        where config_id = #{configId}
+    </update>
+
+    <delete id="deleteSignConfigById" parameterType="Long">
+        delete from sign_config where config_id = #{configId}
+    </delete>
+
+    <delete id="deleteSignConfigByIds" parameterType="String">
+        delete from sign_config where config_id in 
+        <foreach item="configId" collection="array" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+
+</mapper>

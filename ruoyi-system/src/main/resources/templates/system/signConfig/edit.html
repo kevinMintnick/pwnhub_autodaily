@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改用户配置')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-signConfig-edit" th:object="${signConfig}">
+            <input name="configId" th:field="*{configId}" type="hidden">
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">学号：</label>
+                <div class="col-sm-8">
+                    <input name="stuNumber" th:field="*{stuNumber}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">系统ID：</label>
+                <div class="col-sm-8">
+                    <input name="stuSystemId" th:field="*{stuSystemId}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">学生姓名：</label>
+                <div class="col-sm-8">
+                    <input name="stuName" th:field="*{stuName}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">班级：</label>
+                <div class="col-sm-8">
+                    <input name="stuClass" th:field="*{stuClass}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">设备ID：</label>
+                <div class="col-sm-8">
+                    <input name="stuUUID" th:field="*{stuUUID}" class="form-control" type="text">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-3 control-label">标识符：</label>
+                <div class="col-sm-8">
+                    <input name="stuToken" th:field="*{stuToken}" class="form-control" type="text">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/signConfig";
+        $("#form-signConfig-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-signConfig-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

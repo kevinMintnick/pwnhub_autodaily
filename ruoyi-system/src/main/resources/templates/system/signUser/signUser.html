@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('用户管理列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>学号：</label>
+                                <input type="text" name="stuNumber"/>
+                            </li>
+                            <li>
+                                <label>自定义密钥：</label>
+                                <input type="text" name="platformKey"/>
+                            </li>
+                            <li>
+                                <label>区域类型：</label>
+                                <select name="areaType" th:with="type=${@dict.getType('sign_area')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>地址：</label>
+                                <input type="text" name="address"/>
+                            </li>
+                            <li>
+                                <label>经纬度：</label>
+                                <input type="text" name="latlng"/>
+                            </li>
+                            <li>
+                                <label>最后签到日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择最后签到日期" name="lastSignDate"/>
+                            </li>
+                            <li>
+                                <label>最后签到状态：</label>
+                                <select name="lastSignStatus">
+                                    <option value="">所有</option>
+                                    <option value="-1">代码生成请选择字典属性</option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>是否启用：</label>
+                                <input type="text" name="enabled"/>
+                            </li>
+                            <li>
+                                <label>注册日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择注册日期" name="createDate"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:signUser:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:signUser:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:signUser:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:signUser:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:signUser:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:signUser:remove')}]];
+        var areaTypeDatas = [[${@dict.getType('sign_area')}]];
+        var enabledDatas = [[${@dict.getType('sign_enabled')}]];
+        var prefix = ctx + "system/signUser";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "用户管理",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'platformId',
+                    title: '签到平台ID',
+                    visible: false
+                },
+                {
+                    field: 'stuNumber',
+                    title: '学号'
+                },
+                {
+                    field: 'platformKey',
+                    title: '自定义密钥'
+                },
+                {
+                    field: 'areaType',
+                    title: '区域类型',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(areaTypeDatas, value);
+                    }
+                },
+                {
+                    field: 'address',
+                    title: '地址'
+                },
+                {
+                    field: 'latlng',
+                    title: '经纬度'
+                },
+                {
+                    field: 'lastSignDate',
+                    title: '最后签到日期'
+                },
+                {
+                    field: 'lastSignStatus',
+                    title: '最后签到状态'
+                },
+                {
+                    field: 'enabled',
+                    title: '是否启用',
+                    formatter: function(value, row, index) {
+                       return $.table.selectDictLabel(enabledDatas, value);
+                    }
+                },
+                {
+                    field: 'createDate',
+                    title: '注册日期'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.platformId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.platformId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

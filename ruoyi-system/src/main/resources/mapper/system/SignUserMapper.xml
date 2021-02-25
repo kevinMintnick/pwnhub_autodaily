@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SignUserMapper">
+    
+    <resultMap type="SignUser" id="SignUserResult">
+        <result property="platformId"    column="platform_id"    />
+        <result property="stuNumber"    column="stu_number"    />
+        <result property="platformKey"    column="platform_key"    />
+        <result property="areaType"    column="areaType"    />
+        <result property="address"    column="address"    />
+        <result property="latlng"    column="latlng"    />
+        <result property="lastSignDate"    column="last_sign_date"    />
+        <result property="lastSignStatus"    column="last_sign_status"    />
+        <result property="enabled"    column="enabled"    />
+        <result property="createDate"    column="createDate"    />
+    </resultMap>
+
+    <sql id="selectSignUserVo">
+        select platform_id, stu_number, platform_key, areaType, address, latlng, last_sign_date, last_sign_status, enabled, createDate from sign_user
+    </sql>
+
+    <select id="selectSignUserList" parameterType="SignUser" resultMap="SignUserResult">
+        <include refid="selectSignUserVo"/>
+        <where>  
+            <if test="stuNumber != null "> and stu_number = #{stuNumber}</if>
+            <if test="platformKey != null  and platformKey != ''"> and platform_key = #{platformKey}</if>
+            <if test="areaType != null "> and areaType = #{areaType}</if>
+            <if test="address != null  and address != ''"> and address = #{address}</if>
+            <if test="latlng != null  and latlng != ''"> and latlng = #{latlng}</if>
+            <if test="lastSignDate != null "> and last_sign_date = #{lastSignDate}</if>
+            <if test="lastSignStatus != null "> and last_sign_status = #{lastSignStatus}</if>
+            <if test="enabled != null "> and enabled = #{enabled}</if>
+            <if test="createDate != null "> and createDate = #{createDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectSignUserById" parameterType="Long" resultMap="SignUserResult">
+        <include refid="selectSignUserVo"/>
+        where platform_id = #{platformId}
+    </select>
+        
+    <insert id="insertSignUser" parameterType="SignUser" useGeneratedKeys="true" keyProperty="platformId">
+        insert into sign_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuNumber != null">stu_number,</if>
+            <if test="platformKey != null and platformKey != ''">platform_key,</if>
+            <if test="areaType != null">areaType,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="latlng != null and latlng != ''">latlng,</if>
+            <if test="lastSignDate != null">last_sign_date,</if>
+            <if test="lastSignStatus != null">last_sign_status,</if>
+            <if test="enabled != null">enabled,</if>
+            <if test="createDate != null">createDate,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stuNumber != null">#{stuNumber},</if>
+            <if test="platformKey != null and platformKey != ''">#{platformKey},</if>
+            <if test="areaType != null">#{areaType},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="latlng != null and latlng != ''">#{latlng},</if>
+            <if test="lastSignDate != null">#{lastSignDate},</if>
+            <if test="lastSignStatus != null">#{lastSignStatus},</if>
+            <if test="enabled != null">#{enabled},</if>
+            <if test="createDate != null">#{createDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSignUser" parameterType="SignUser">
+        update sign_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stuNumber != null">stu_number = #{stuNumber},</if>
+            <if test="platformKey != null and platformKey != ''">platform_key = #{platformKey},</if>
+            <if test="areaType != null">areaType = #{areaType},</if>
+            <if test="address != null and address != ''">address = #{address},</if>
+            <if test="latlng != null and latlng != ''">latlng = #{latlng},</if>
+            <if test="lastSignDate != null">last_sign_date = #{lastSignDate},</if>
+            <if test="lastSignStatus != null">last_sign_status = #{lastSignStatus},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="createDate != null">createDate = #{createDate},</if>
+        </trim>
+        where platform_id = #{platformId}
+    </update>
+
+    <delete id="deleteSignUserById" parameterType="Long">
+        delete from sign_user where platform_id = #{platformId}
+    </delete>
+
+    <delete id="deleteSignUserByIds" parameterType="String">
+        delete from sign_user where platform_id in 
+        <foreach item="platformId" collection="array" open="(" separator="," close=")">
+            #{platformId}
+        </foreach>
+    </delete>
+
+</mapper>

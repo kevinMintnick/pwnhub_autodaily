@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>fuckTryee4.0 - 日志</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/home">首页</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/add">开始使用</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="/signlog">查询记录</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">启用账户</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">停用账户</a>
+        </li>
+    </ul>
+</nav>
+<div class="col-md-8 offset-md-2" style="margin-top: 30px">
+    <div class="container-fluid p-t-15">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <header class="card-header">
+                        <div class="callout callout-danger" id="head-message">
+                            签到日志
+                        </div>
+                    </header>
+                    <div class="card-body">
+                        <div id="toolbar" class="toolbar-btn-action" style="margin-bottom: 3%">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <label class="sr-only" for="stu_number">学号</label>
+                                    <input class="form-control mb-2 mr-sm-2" type="text" id="stu_number"
+                                           name="stu_number" placeholder="学号">
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="key">秘钥</label>
+                                    <input class="form-control mb-2 mr-sm-2" type="text" id="key" name="key"
+                                           placeholder="秘钥">
+                                </div>
+                                <div class="form-group">
+                                    <button class="btn btn-primary" type="button" id="searchBtn"
+                                            style="margin-left:20px;margin-top:-3px">
+                                        <i class="fa fa-search"></i> 查询
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="alert alert-success" id="message">
+                            <strong>信息!</strong> 请注意这个信息。
+                        </div>
+                        <div class="col-lg-12">
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>编号</th>
+                                <th>日期</th>
+                                <th>体温</th>
+                                <th>地址</th>
+<!--                                <th>经度</th>-->
+<!--                                <th>纬度</th>-->
+                                <th>响应</th>
+<!--                                <th>加密摘要</th>-->
+                            </tr>
+                            </thead>
+                            <tbody id="tr">
+
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#searchBtn").click(function () {
+        let stuNumber = $("#stu_number").val();
+        let key = $("#key").val();
+        $.ajax({
+            url: "querySignLog", // 请求路径
+            type: "GET", //请求方式
+            data: {
+                "stuNumber": stuNumber,
+                "key": key,
+            },
+            dataType: "text",
+            success: function (data) {
+                //alert(data);
+                var obj = jQuery.parseJSON(data);
+                $("#head-message").empty();
+                if (obj.code!==200){
+                    alert(obj.message)
+                    return
+                }
+                $("#head-message")
+                    .append("<span>签到日志(" + obj.data.user.stuNumber + ")</span>")
+                $("#message").empty();
+                obj.data.user.createDate = formatDate(obj.data.user.createDate)
+                $("#message")
+                    .append("<li>消息：" + obj.code + "-" + obj.message + "</li>")
+                    .append("<li>学号：" + obj.data.user.stuNumber + "</li>")
+                    .append("<li>姓名：" + obj.data.config.stuName + "</li>")
+                    .append("<li>地址：" + obj.data.user.address + "</li>")
+                    .append("<li>区域类型：" + obj.data.user.areaType + "</li>")
+                    .append("<li>注册日期：" + obj.data.user.createDate + "</li>")
+                    .append("<li>最后签到日期：" + formatDate(obj.data.user.lastSignDate) + "</li>")
+                    .append("<li>是否启用(1启用/0禁用)：" + obj.data.user.enabled)
+                var html = '';
+                for (var i = 0; i < obj.data.signlog.length; i++) {//循环json对象，拼接tr,td的html
+                    obj.data.signlog[i].logDate = formatDate(obj.data.signlog[i].logDate)
+                    html = html + '<tr>';
+                    /**<span class="badge badge-success">成功</span>
+                     *
+                     * @type {string}
+                     */
+                    html = html + '<td><span class="badge badge-pill badge-success">' + obj.data.signlog[i].logId + '</span></td>';
+                    html = html + '<td>' + obj.data.signlog[i].logDate + '</td>';
+                    html = html + '<td><span class="badge badge-pill badge-info">' + obj.data.signlog[i].temperature + '</span></td>';
+                    html = html + '<td title=' + obj.data.signlog[i].address + ">" + obj.data.signlog[i].address.substring(0,15) + "..." + '</td>';
+                    //html = html + '<td>' + obj.data.signlog[i].lat + '</td>';
+                    //html = html + '<td>' + obj.data.signlog[i].lng + '</td>';
+                    var remark;
+                    if (obj.data.signlog[i].code==="0"){
+                        html = html + '<td><div class="alert alert-success" role="alert"><i class="fa fa-check-circle" aria-hidden="true"></i>' + "识别码：" +  obj.data.signlog[i].code + "&nbsp;&nbsp;&nbsp;状态：" +  '<b>' + obj.data.signlog[i].response + '</b></div></td>';
+                    }else{
+                        html = html + '<td><div class="alert alert-danger" role="alert"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>' + "识别码：" +  obj.data.signlog[i].code + "&nbsp;&nbsp;&nbsp;状态：" + '<b>' +  obj.data.signlog[i].response + '</b></div></td>';
+                    }
+                    //html = html + '<td>' + obj.data.signlog[i].encryptKey + '</td>';
+                    html = html + '</tr>';
+                }
+                console.log(html)
+                $('#tr').html(html);//通过jquery方式获取table，并把tr,td的html输出到table中
+            },//响应成功后的回调函数
+            error: function () {
+                alert("出错啦...")
+            },//表示如果请求响应出现错误，会执行的回调函数
+        });
+
+    });
+    function formatDate(date) {
+        var date = new Date(date);
+        var YY = date.getFullYear() + '-';
+        var MM = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+        var DD = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
+        var hh = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+        var mm = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+        var ss = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+        return YY + MM + DD +" "+hh + mm + ss;
+    }
+</script>
+</body>
+</html>

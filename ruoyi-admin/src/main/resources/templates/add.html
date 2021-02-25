@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <title>fuckTryee4.0 - 新增</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=9310e37de0b163914d91c34dc1de1141"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!--引入UI组件库（1.1版本） -->
+    <script src="//webapi.amap.com/ui/1.1/main.js"></script>
+    <style>
+        .form-signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+        }
+        #container {
+            width:300px; height: 180px;
+        }
+
+        button, input, select {
+            margin: 0;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: inherit;
+            overflow: visible;
+            text-transform: none
+        }
+
+        [type=button]::-moz-focus-inner, [type=reset]::-moz-focus-inner, [type=submit]::-moz-focus-inner, button::-moz-focus-inner {
+            padding: 0;
+            border-style: none;
+        }
+
+        input[type=checkbox], input[type=radio] {
+            box-sizing: border-box;
+            padding: 0;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0 0.5rem 0 0;
+        }
+
+        h4 {
+            font-family: inherit;
+            line-height: 1.8;
+            font-weight: 300;
+            color: inherit;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: .5rem
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            border: 1px solid transparent;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            background-color: transparent;
+            background-image: none;
+            color: #25A5F7;
+            border-color: #25A5F7;
+            padding: .25rem .5rem;
+            line-height: 1.5;
+            border-radius: 1rem;
+            -webkit-appearance: button;
+            cursor:pointer;
+        }
+
+        .btn:hover {
+            color: #fff;
+            background-color: #25A5F7;
+            border-color: #25A5F7
+        }
+
+        .btn:hover {
+            text-decoration: none
+        }
+
+        .input-item {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-wrap: wrap;
+            flex-wrap: wrap;
+            -ms-flex-align: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .input-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-item>select, .input-item>input[type=text], .input-item>input[type=date] {
+            position: relative;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            width: 1%;
+            margin-bottom: 0;
+        }
+
+        .input-item>select:not(:last-child), .input-item>input[type=text]:not(:last-child), .input-item>input[type=date]:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0
+        }
+
+        .input-item>select:not(:first-child), .input-item>input[type=text]:not(:first-child), .input-item>input[type=date]:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0
+        }
+
+        .input-item-prepend {
+            margin-right: -1px;
+        }
+
+        .input-item-text, input[type=text],input[type=date], select {
+            height: calc(2.2rem + 2px);
+        }
+
+        .input-item-text {
+            width: 6rem;
+            text-align: justify;
+            padding: 0.4rem 0.7rem;
+            display: inline-block;
+            text-justify: distribute-all-lines;
+            /*ie6-8*/
+            text-align-last: justify;
+            /* ie9*/
+            -moz-text-align-last: justify;
+            /*ff*/
+            -webkit-text-align-last: justify;
+            /*chrome 20+*/
+            -ms-flex-align: center;
+            align-items: center;
+            margin-bottom: 0;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #495057;
+            text-align: center;
+            white-space: nowrap;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            border-bottom-right-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .input-item-text input[type=checkbox], .input-item-text input[type=radio] {
+            margin-top: 0
+        }
+
+        .input-card {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border-radius: .25rem;
+            width: 22rem;
+            border-width: 0;
+            border-radius: 0.4rem;
+            box-shadow: 0 2px 6px 0 rgba(114, 124, 245, .5);
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
+            padding: 0.75rem 1.25rem;
+        }
+
+        .input-text {
+            line-height: 2rem;
+            margin-right: 2rem;
+        }
+
+        .info hr {
+            margin-right: 0;
+            margin-left: 0;
+            border-top-color: grey;
+        }
+
+        .info {
+            width: auto;
+            min-width: 22rem;
+            border-width: 0;
+            box-shadow: 0 2px 6px 0 rgba(114, 124, 245, .5);
+        }
+
+        .code {
+            left: 1.5rem;
+            right: 1.5rem;
+            top: 1.5rem;
+            bottom: 1.5rem;
+            overflow: auto;
+            margin-bottom: 0rem;
+        }
+
+        .code .btn {
+            top: 1rem;
+            position: absolute;
+            right: 1rem;
+        }
+
+        .code .result {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            bottom: 1rem;
+            position: absolute;
+            top: 5.5rem;
+            right: 1rem;
+            left: 1rem;
+            overflow: auto;
+        }
+
+        .code .status {
+            color: #80adff;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .code h4 {
+            display: inline-block;
+            max-width: 20rem;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        select, input[type=text], input[type=date] {
+            display: inline-block;
+            width: 100%;
+            padding: .375rem 1.75rem .375rem .75rem;
+            line-height: 1.5;
+            color: #495057;
+            vertical-align: middle;
+            background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .75rem center;
+            background-size: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none
+        }
+
+        input[type=text],input[type=date] {
+            background: #fff;
+            padding: .375rem .75rem;
+        }
+
+        select:focus, input[type=text]:focus, input[type=date]:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 .1rem rgba(128, 189, 255, .1)
+        }
+
+        .btn:focus {
+            outline: 0;
+            box-shadow: none;
+        }
+
+        select:focus::-ms-value, input[type=text]:focus::-ms-value,input[type=date]:focus::-ms-value {
+            color: #495057;
+            background-color: #fff
+        }
+
+
+        /* native toastr */
+        .native-toast {
+            position: fixed;
+            background-color: rgba(50, 50, 50, .8);
+            border-radius: 33px;
+            color: white;
+            left: 50%;
+            text-align: center;
+            padding: 6px 12px;
+            opacity: 0;
+            z-index: 99999;
+            transition: transform .25s, opacity .25s, top .25s;
+            box-sizing: border-box;
+        }
+
+        .native-toast-bottom {
+            bottom: 50px;
+            -ms-transform: translateX(-50%) translateY(50px);
+            transform: translateX(-50%) translateY(50px)
+        }
+
+        .native-toast-bottom.native-toast-shown {
+            opacity: 1;
+            -ms-transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .native-toast-bottom.native-toast-edge {
+            bottom: 0;
+        }
+
+        .native-toast-top {
+            top: 50px;
+            -ms-transform: translateX(-50%) translateY(-50px);
+            transform: translateX(-50%) translateY(-50px)
+        }
+
+        .native-toast-top.native-toast-shown {
+            opacity: 1;
+            -ms-transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .native-toast-top.native-toast-edge {
+            top: 0;
+        }
+
+        .native-toast-center {
+            top: 0;
+            -ms-transform: translateX(-50%) translateY(-50px);
+            transform: translateX(-50%) translateY(-50px)
+        }
+
+        .native-toast-center.native-toast-shown {
+            opacity: 1;
+            top: 50%;
+            -ms-transform: translateX(-50%) translateY(-50%);
+            transform: translateX(-50%) translateY(-50%);
+        }
+
+        .native-toast-edge {
+            border-radius: 0;
+            width: 100%;
+            text-align: left;
+        }
+
+        @media screen and (min-width: 40rem) {
+            .native-toast:not(.native-toast-edge) {
+                max-width: 18rem;
+            }
+        }
+
+        /*
+          max-width does not seem to work in small screen?
+        */
+
+        /*@media screen and (max-width: 768px) {
+          .native-toast:not(.native-toast-edge) {
+            max-width: 400px;
+          }
+        }
+
+        @media screen and (max-width: 468px) {
+          .native-toast:not(.native-toast-edge) {
+            max-width: 300px;
+          }
+        }*/
+
+        /* types */
+
+        .native-toast-error {
+            background-color: #d92727;
+            color: white;
+        }
+
+        .native-toast-success {
+            background-color: #62a465;
+            color: white;
+        }
+
+        .native-toast-warning {
+            background-color: #fdaf17;
+            color: white;
+        }
+
+        .native-toast-info {
+            background-color: #5060ba;
+            color: white;
+        }
+
+        [class^="native-toast-icon-"] {
+            vertical-align: middle;
+            margin-right: 8px
+        }
+
+        [class^="native-toast-icon-"] svg {
+            width: 16px;
+            height: 16px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/home">首页</a>
+        </li>
+        <li class="nav-item active">
+            <a class="nav-link" href="/add">开始使用</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/signlog">查询记录</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">启用账户</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">停用账户</a>
+        </li>
+    </ul>
+</nav>
+
+<form class="form-signin">
+    <h4><b>胖哈勃实验室 - FuckTryee4.0</b></h4>
+    <h1 class="h6 mb-3 font-weight-normal">请在下方登记必要信息即可完成注册</br></h1>
+    <label style="font-size: 10px" for="stu_number">学号:</label>
+    <input type="text" id="stu_number" class="form-control" placeholder="学号" required="" autofocus="">
+    <label style="font-size: 10px" for="key">秘钥（用于查询签到记录）:</label>
+    <input type="text" id="key" class="form-control" placeholder="秘钥" required="" value="123456789" autofocus="">
+    <label style="font-size: 10px" for="address">签到所用地址（高德定位）:</label>
+    <textarea rows="3" cols="20"  id="address" class="form-control" placeholder="地址" required="" autofocus=""></textarea>
+    <label style="font-size: 10px" for="address">缺德地图（支持选点）：</label>
+    <div class="card">
+        <div  id="container">
+        </div>
+
+    </div>
+    <div>
+    <!-- 按钮触发模态框 -->
+    <button class="btn btn-primary btn-small" data-toggle="modal" data-target="#myModal">搜索选址</button>
+    </div>
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">搜索选址</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="info">
+                        <div class="input-item">
+                            <div class="input-item-prepend">
+                                <span class="input-item-text" style="width:8rem;">搜索选址</span>
+                            </div>
+                            <input id='address_select' type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">提交更改</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+
+    <label style="font-size: 10px" for="areaType">区域类型：</label>
+        <select class="form-control" id="areaType">
+            <option value="0">0-校外区域</option>
+            <option value="1" disabled="disabled">1-学府东苑（禁用）</option>
+            <option value="2" disabled="disabled">2-学府西苑（禁用）</option>
+            <option value="3" disabled="disabled">3-教学区（禁用）</option>
+        </select>
+    <label style="font-size: 10px" for="key">经纬度:</label>
+    <input type="text" id="latlng" class="form-control" disabled="disabled" placeholder="秘钥" required="" value="-1,-1" autofocus="">
+    <button class="btn btn-lg btn-primary btn-block" style="margin-top: 15px" type="button" id="submitBtn">确定</button>
+    <br class="mt-5 mb-3 text-muted">© 2019-2020 胖哈勃实验室</br>
+    <div class="alert alert-danger">
+        <strong> 我们会在每天早上7:03左右，<br>晚上21:01左右为您完成签到。<br>请低调使用~</strong>
+    </div>
+    <div class="alert alert-info" id="message">
+        <strong>信息!</strong> 请注意这个信息。
+    </div>
+</form>
+<script>
+    $("#submitBtn").click(function(){
+        let stuNumber = $("#stu_number").val();
+        let key = $("#key").val();
+        let areaType = $("#areaType").val();
+        let address = $("#address").val();
+        stripscript(address);
+        let latlng = $("#latlng").val();
+        swal({
+            title: "确认无误？",
+            text: "点击确定按钮将执行注册操作，如果需要修改请返回。",
+            icon: "warning",
+            buttons: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url:"addUser" , // 请求路径
+                        type:"POST" , //请求方式
+                        data:{
+                            "stuNumber":stuNumber,
+                            "key":key,
+                            "latlng":latlng,
+                            "areaType":areaType,
+                            "address":address
+                        },
+                        success:function (data) {
+                            //alert(data);
+                            var obj = jQuery.parseJSON(data);
+                            $("#message").empty();
+                            $("#message")
+                                .append("<li>消息：" + obj.code + "-" + obj.message + "</li>")
+                                .append("<li>学号：" + obj.data.user.stuNumber + "</li>")
+                                .append("<li>姓名：" + obj.data.config.stuName + "</li>")
+                                .append("<li>分院：信息媒体学院 </li>")
+                                .append("<li>班级：" + obj.data.config.stuClass + "</li>")
+                                .append("<li>系统ID：" + obj.data.config.stuSystemId + "</li>")
+                                .append("<li>UUID：" + obj.data.config.stuUUID + "</li>");
+                        },//响应成功后的回调函数
+                        error:function () {
+                            swal ( "哎哟" ,  "好像出了问题!" ,  "error" )
+                        },//表示如果请求响应出现错误，会执行的回调函数
+
+                        dataType:"text"//设置接受到的响应数据的格式
+                    });
+                }
+            });
+    });
+</script>
+    <script type="text/javascript">
+    var map = new AMap.Map('container', {
+        resizeEnable: true
+    });
+    AMap.plugin('AMap.Geolocation', function() {
+        var geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：5s
+            buttonPosition:'RB',    //定位按钮的停靠位置
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,   //定位成功后是否自动调整地图视野到定位点
+
+        });
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition(function(status,result){
+            if(status=='complete'){
+                onComplete(result)
+            }else{
+                onError(result)
+            }
+        });
+    });
+
+    AMapUI.loadUI(['misc/PoiPicker'], function(PoiPicker) {
+        var poiPicker = new PoiPicker({
+            //city:'北京',
+            input: 'address_select'
+        });
+        //初始化poiPicker
+        poiPickerReady(poiPicker);
+    });
+    function poiPickerReady(poiPicker) {
+        window.poiPicker = poiPicker;
+        var marker = new AMap.Marker();
+        var infoWindow = new AMap.InfoWindow({
+            offset: new AMap.Pixel(0, -20)
+        });
+        //选取了某个POI
+        poiPicker.on('poiPicked', function(poiResult) {
+            var source = poiResult.source,
+                poi = poiResult.item;
+            marker.setMap(map);
+            marker.setPosition(poi.location);
+            map.setCenter(marker.getPosition());
+        });
+
+        poiPicker.onCityReady(function() {
+            poiPicker.suggest('美食');
+        });
+    }
+
+
+
+
+    //解析定位结果
+    function onComplete(data) {
+        console.log("定位成功")
+        console.log(data)
+        $("#address").val(data.formattedAddress + data.addressComponent.township + data.addressComponent.streetNumber)
+        $("#latlng").val(data.position.lat + "," + data.position.lng)
+    }
+    //解析定位错误信息
+    function onError(data) {
+        // document.getElementById('status').innerHTML='定位失败'
+        // document.getElementById('result').innerHTML = '失败原因排查信息:'+data.message;
+        sweetAlert("Oops...", "定位失败，请检查您是否授予了定位权限以及是否开启了VPN等代理程序……", "error");
+    }
+    //加载拖拽控件
+    AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
+        var positionPicker = new PositionPicker({
+            mode:'dragMap',//设定为拖拽地图模式，可选'dragMap'、'dragMarker'，默认为'dragMap'
+            map:map//依赖地图对象
+        });
+        //TODO:事件绑定、结果处理等
+        positionPicker.on('success', function(positionResult) {
+            $("#address").val(positionResult.regeocode.addressComponent.province + positionResult.regeocode.addressComponent.city + positionResult.regeocode.addressComponent.district + positionResult.regeocode.addressComponent.street + positionResult.regeocode.addressComponent.township + positionResult.regeocode.addressComponent.streetNumber)
+            $("#latlng").val(positionResult.position.lat + "," + positionResult.position.lng)
+            console.log(positionResult)
+        });
+        positionPicker.on('fail', function(positionResult) {
+            sweetAlert("Oops...", "拖拽获取地理位置失败……", "error");
+        });
+        positionPicker.start();
+    });
+    // 过滤所有特殊字符
+    var stripscript = function(s) {
+        var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？↵\r\n]");
+        var rs = "";
+        for (var i = 0; i < s.length; i++) {
+            rs = rs + s.substr(i, 1).replace(pattern, '');
+        }
+        return rs;
+    }
+    </script>
+</body>
+</html>

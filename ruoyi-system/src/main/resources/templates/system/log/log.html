@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('签到日志列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>学号：</label>
+                                <input type="text" name="stuNumber"/>
+                            </li>
+                            <li>
+                                <label>系统编号：</label>
+                                <input type="text" name="systemId"/>
+                            </li>
+                            <li>
+                                <label>体温：</label>
+                                <input type="text" name="temperature"/>
+                            </li>
+                            <li>
+                                <label>地址：</label>
+                                <input type="text" name="address"/>
+                            </li>
+                            <li>
+                                <label>经度：</label>
+                                <input type="text" name="lat"/>
+                            </li>
+                            <li>
+                                <label>纬度：</label>
+                                <input type="text" name="lng"/>
+                            </li>
+                            <li>
+                                <label>签到状态：</label>
+                                <select name="status">
+                                    <option value="">所有</option>
+                                    <option value="-1">代码生成请选择字典属性</option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>响应：</label>
+                                <input type="text" name="response"/>
+                            </li>
+                            <li>
+                                <label>加密值：</label>
+                                <input type="text" name="encryptKey"/>
+                            </li>
+                            <li>
+                                <label>日志日期：</label>
+                                <input type="text" class="time-input" placeholder="请选择日志日期" name="logDate"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:log:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:log:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:log:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:log:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:log:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:log:remove')}]];
+        var prefix = ctx + "system/log";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "签到日志",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'logId',
+                    title: '日志编号',
+                    visible: false
+                },
+                {
+                    field: 'stuNumber',
+                    title: '学号'
+                },
+                {
+                    field: 'systemId',
+                    title: '系统编号'
+                },
+                {
+                    field: 'temperature',
+                    title: '体温'
+                },
+                {
+                    field: 'address',
+                    title: '地址'
+                },
+                {
+                    field: 'lat',
+                    title: '经度'
+                },
+                {
+                    field: 'lng',
+                    title: '纬度'
+                },
+                {
+                    field: 'status',
+                    title: '签到状态'
+                },
+                {
+                    field: 'response',
+                    title: '响应'
+                },
+                {
+                    field: 'encryptKey',
+                    title: '加密值'
+                },
+                {
+                    field: 'logDate',
+                    title: '日志日期'
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.logId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.logId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

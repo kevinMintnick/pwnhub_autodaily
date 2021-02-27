@@ -70,10 +70,10 @@ spring:
       # 热部署开关
       enabled: true
   dingtalk:
-    token-id: 9f2f4e67a89f3663db67ce6e1ece76762480304c438d22195a2198a5a7ef4d83
+    token-id: null
     project-id: ${spring.application.name}
     title: 胖哈勃实验室 - 体温签到系统
-    secret: SECae754cd61bfe6fe0f032e914d58b518d0356e6a721e0af5b5651ba1345305ea6
+    secret: null
     # 定义 XXXDinger.xml 文件存放路径
     dinger-locations: classpath*:dinger/*.xml
 

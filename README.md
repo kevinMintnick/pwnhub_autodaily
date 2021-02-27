@@ -17,7 +17,7 @@
 <table>
     <tr>
         <td><img src="https://s3.ax1x.com/2021/02/27/6S5Zvt.png"/></td>
-        <td><img src="https://s3.ax1x.com/2021/02/27/6S5ub8.png"/></td>
+        <td><img src="https://s3.ax1x.com/2021/02/27/6SoGn0.png"/></td>
     </tr>
     <tr>
         <td><img src="https://s3.ax1x.com/2021/02/27/6S5mKP.png"/></td>

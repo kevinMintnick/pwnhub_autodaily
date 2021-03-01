@@ -470,12 +470,12 @@
     <label style="font-size: 10px" for="areaType">区域类型：</label>
         <select class="form-control" id="areaType">
             <option value="0">0-校外区域</option>
-            <option value="1" disabled="disabled">1-学府东苑（禁用）</option>
-            <option value="2" disabled="disabled">2-学府西苑（禁用）</option>
-            <option value="3" disabled="disabled">3-教学区（禁用）</option>
+            <option value="2" id="xueFuWest">2-学府西苑</option>
+            <option value="1" id="xueFuEast">1-学府东苑</option>
+            <option value="3" id="TeachingArea" disabled="disabled">3-教学区【禁用】</option>
         </select>
     <label style="font-size: 10px" for="key">经纬度:</label>
-    <input type="text" id="latlng" class="form-control" disabled="disabled" placeholder="秘钥" required="" value="-1,-1" autofocus="">
+    <input type="text" id="latlng" class="form-control" disabled="disabled" placeholder="经纬度" required="" value="-1,-1" autofocus="">
     <button class="btn btn-lg btn-primary btn-block" style="margin-top: 15px" type="button" id="submitBtn">确定</button>
     <br class="mt-5 mb-3 text-muted">© 2019-2020 胖哈勃实验室</br>
     <div class="alert alert-danger">
@@ -578,16 +578,26 @@
             marker.setMap(map);
             marker.setPosition(poi.location);
             map.setCenter(marker.getPosition());
+            console.log("marker.getPosition()= " + marker.getPosition())
         });
 
         poiPicker.onCityReady(function() {
             poiPicker.suggest('美食');
         });
+
+        $("#areaType").change(function(){
+        let areaType = $(this).children('option:selected').val();
+        if (areaType==="1"){
+            //定位到东苑
+            marker.setPosition([121.63422,29.916702]);
+            map.setCenter(marker.getPosition());
+
+        }else if (areaType==="2"){
+            marker.setPosition([121.621049,29.916473]);
+            map.setCenter(marker.getPosition());
+        }
+        });
     }
-
-
-
-
     //解析定位结果
     function onComplete(data) {
         console.log("定位成功")

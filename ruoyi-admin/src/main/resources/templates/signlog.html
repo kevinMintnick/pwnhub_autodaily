@@ -10,6 +10,7 @@
     <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 </head>
 <body>
@@ -59,6 +60,10 @@
                                     <button class="btn btn-primary" type="button" id="searchBtn"
                                             style="margin-left:20px;margin-top:-3px">
                                         <i class="fa fa-search"></i> 查询
+                                    </button>
+                                    <button class="btn btn-primary" type="button" id="deleteUserBtn"
+                                            style="margin-left:20px;margin-top:-3px">
+                                        <i class="fa fa-trash"></i> 删除账户
                                     </button>
                                 </div>
                             </form>
@@ -166,6 +171,48 @@
         var ss = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
         return YY + MM + DD +" "+hh + mm + ss;
     }
+</script>
+
+<script>
+    $("#deleteUserBtn").click(function(){
+        let stuNumber = $("#stu_number").val();
+        let key = $("#key").val();
+        swal({
+            title: "确认无误？",
+            text: "您确定要删除学号" + stuNumber + "的账户吗？如果误触请返回。",
+            icon: "warning",
+            buttons: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    console.log("开始访问删除用户接口")
+                    $.ajax({
+                        url:"deleteUser" , // 请求路径
+                        type:"POST" , //请求方式
+                        data:{
+                            "stuNumber":stuNumber,
+                            "key":key,
+                        },
+                        success:function (data) {
+                            //alert(data);
+                            var obj = jQuery.parseJSON(data);
+                            swal("提示",obj.message + "{" + stuNumber + "}")
+                            $('button, .confirm').click(function () {
+                                location.reload()
+                            })
+                        },//响应成功后的回调函数
+                        error:function () {
+                            swal ( "哎哟" ,  "好像出了问题!" ,  "error" )
+                            $('button, .confirm').click(function () {
+                                location.reload()
+                            })
+                        },//表示如果请求响应出现错误，会执行的回调函数
+
+                        dataType:"text"//设置接受到的响应数据的格式
+                    });
+                }
+            });
+    });
 </script>
 </body>
 </html>

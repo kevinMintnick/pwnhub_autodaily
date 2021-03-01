@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
+import com.github.pagehelper.PageHelper;
 import com.ruoyi.fucktryee.enums.ResultEnum;
 import com.ruoyi.fucktryee.pojo.Config;
 import com.ruoyi.fucktryee.pojo.Result;
@@ -25,6 +26,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 胖哈勃实验室 法克创艺 综合控制器
@@ -52,15 +54,15 @@ public class FuckChuangyiController {
         //跳转到首页
         //统计平台用户数量
         Integer platformUserNum = userServices.countPlatformUserNum();
-        boolean allowRegister =  Boolean.parseBoolean(settingServices.selectSetting("allow_register").getSettingValue());
+        boolean allowRegister = Boolean.parseBoolean(settingServices.selectSetting("allow_register").getSettingValue());
         //统计签到记录条数
         Integer signCount = signLogServices.countSign();
         //获取最后签到时间
         SignLog lastSignDate = signLogServices.querylastSignDate();
-        mv.addObject("allowRegister",allowRegister);
-        mv.addObject("platformUserNum",platformUserNum);
-        mv.addObject("signCount",signCount);
-        mv.addObject("lastSignDate",lastSignDate.getLogDate());
+        mv.addObject("allowRegister", allowRegister);
+        mv.addObject("platformUserNum", platformUserNum);
+        mv.addObject("signCount", signCount);
+        mv.addObject("lastSignDate", lastSignDate.getLogDate());
 
         return mv;
     }
@@ -83,7 +85,7 @@ public class FuckChuangyiController {
             @RequestParam(value = "key") String key,
             @RequestParam(value = "address") String address,
             @RequestParam(value = "areaType") String areaType,
-            @RequestParam(value = "latlng" )String latlng
+            @RequestParam(value = "latlng") String latlng
     ) throws ParseException {
         //过滤非法字符
         address = StringUtils.stringFilter(address);
@@ -92,7 +94,9 @@ public class FuckChuangyiController {
         //地址配置区
         //String address1 = "浙江省宁波市江北区明海南路101号靠近浙江纺织服装职业技术学院生活区##浙江省宁波市江北区浙江纺织服装职业技术学院生活区##浙江省宁波市镇海区明海南路255号靠近公园世家1期##浙江省宁波市镇海区浙江纺织服装职业技术学院生活区(南门)";
         //String address2 = "浙江省宁波市镇海区毓秀路488号宁大学生村##浙江省宁波市镇海区宁波大学毓秀路488号学府东苑##浙江省宁波市镇海区宁大步行街128号附近学府东苑七公寓##浙江省宁波市镇海区庄市大道121号";
-        if (StringUtils.isEmpty(address)){ return ResultUtil.fail(ResultEnum.FAIL.code, "地址信息为空或异常，注册失败！"); }
+        if (StringUtils.isEmpty(address)) {
+            return ResultUtil.fail(ResultEnum.FAIL.code, "地址信息为空或异常，注册失败！");
+        }
         Config config = configServices.selectConfig(stuNumber);
         //如果config不为空，则新增用户。
         if (config != null) {
@@ -114,15 +118,47 @@ public class FuckChuangyiController {
                 if (result > 0) {
                     jsonObject.put("user", auser);
                     jsonObject.put("config", config);
-                    return ResultUtil.success(ResultEnum.SUCCESS.code,jsonObject,"注册成功");
+                    return ResultUtil.success(ResultEnum.SUCCESS.code, jsonObject, "注册成功");
                 } else {
                     return ResultUtil.fail(ResultEnum.FAIL.code, "注册失败");
                 }
-            }else{
+            } else {
                 return ResultUtil.fail(ResultEnum.FAIL.code, "您已经注册过了，如果需要删除账户请联系邮箱：i@pwnhub.net");
             }
         } else {
             return ResultUtil.fail(ResultEnum.FAIL.code, "在平台找不到这个学号的配置信息，目前仅支持信息学院部分学生。");
         }
+    }
+
+    /**
+     * 删除用户
+     *
+     * @param stuNumber
+     * @param key
+     * @return
+     */
+
+    @PostMapping(value = "deleteUser")
+    @ResponseBody
+    public Result deleteUser(
+            @RequestParam(value = "stuNumber", required = true) String stuNumber,
+            @RequestParam(value = "key", required = true) String key) {
+        System.out.println("进入删除用户控制器");
+        JSONObject jsonObject = new JSONObject();
+        //判断key和学号是否正确
+        if (!"".equals(stuNumber) && !"".equals(key)) {
+            User auser = userServices.selectUserAuth(stuNumber, key);
+            if (auser != null) {
+                //删除用户
+                Integer result = userServices.deleteUserByStuNumberAndPassword(stuNumber, key);
+                jsonObject.put("user",auser.getStuNumber());
+                if (result > 0) {
+                    return ResultUtil.success(ResultEnum.SUCCESS.code, jsonObject, "删除成功~");
+                } else {
+                    return ResultUtil.fail(ResultEnum.FAIL.code, "删除失败，请检查学号和秘钥是否正确~");
+                }
+            }
+        }
+        return ResultUtil.fail(ResultEnum.FAIL.code, "删除失败，请检查学号和秘钥是否正确~");
     }
 }

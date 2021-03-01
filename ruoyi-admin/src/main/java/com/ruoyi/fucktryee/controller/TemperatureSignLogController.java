@@ -89,4 +89,5 @@ public class TemperatureSignLogController {
             return ResultUtil.fail(ResultEnum.FAIL.code, "学号或秘钥为空~");
         }
     }
+
 }

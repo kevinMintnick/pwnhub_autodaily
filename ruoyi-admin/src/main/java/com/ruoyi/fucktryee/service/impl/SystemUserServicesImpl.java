@@ -53,4 +53,9 @@ public class SystemUserServicesImpl implements ISystemUserServices {
     public List<User> selectResignList() {
         return userMapper.selectResignList();
     }
+
+    @Override
+    public Integer deleteUserByStuNumberAndPassword(String stuNumber,String platformKey) {
+        return userMapper.deleteUserByStuNumberAndPassword(stuNumber,platformKey);
+    }
 }

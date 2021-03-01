@@ -80,4 +80,7 @@ public interface ISystemUserMapper {
     })
     List<User> selectResignList();
 
+    @Delete("DELETE FROM sign_user WHERE stu_number = #{stuNumber} AND platform_key = #{platformKey}")
+    Integer deleteUserByStuNumberAndPassword(@Param("stuNumber") String stuNumber,@Param("platformKey") String platformKey);
+
 }

@@ -288,6 +288,7 @@ public class ShiroConfig
         filterChainDefinitionMap.put("/signlog","anon");
         filterChainDefinitionMap.put("/querySignLog","anon");
         filterChainDefinitionMap.put("/addUser","anon");
+        filterChainDefinitionMap.put("/deleteUser","anon");
 
         // 注册相关
         filterChainDefinitionMap.put("/register", "anon,captchaValidate");

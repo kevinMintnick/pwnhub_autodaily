@@ -13,4 +13,5 @@ public interface ISystemUserServices {
     User selectUserAuth(String stuNumber,String key);
     Integer updateLastSignStatus(Integer lastSignStatus,String stuNumber);
     List<User> selectResignList();
+    Integer deleteUserByStuNumberAndPassword(String stuNumber,String platformKey);
 }

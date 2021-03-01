@@ -1,5 +1,5 @@
 ## 系统简介
-1. 一款基于SpringBoot、MyBatis、Quartz构建的纺院钉钉体温自动签到系统。我给他取名为：FuckTryee(法克创艺)
+1. 一款基于SpringBoot、MyBatis、Quartz、OkHttp……构建的纺院钉钉体温自动签到系统。我给他取名为：FuckTryee(法克创艺)
 2. 中国网络信息安全任重而道远，这个项目仅供网络信息安全学习。对使用此项目产生任何责任，本人不做负责。
 
 ## 系统特色

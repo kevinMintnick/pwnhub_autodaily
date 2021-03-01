@@ -1,10 +1,12 @@
 package com.ruoyi.fucktryee.controller;
 
+import ch.qos.logback.core.joran.event.SaxEventRecorder;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 import com.github.pagehelper.PageHelper;
+import com.ruoyi.common.utils.IpUtils;
 import com.ruoyi.fucktryee.enums.ResultEnum;
 import com.ruoyi.fucktryee.pojo.Config;
 import com.ruoyi.fucktryee.pojo.Result;
@@ -15,12 +17,15 @@ import com.ruoyi.fucktryee.service.impl.SystemUserServicesImpl;
 import com.ruoyi.fucktryee.service.impl.TemperatureSignLogServicesImpl;
 import com.ruoyi.fucktryee.service.impl.UserConfigServicesImpl;
 import com.ruoyi.fucktryee.utils.ResultUtil;
+import com.ruoyi.fucktryee.utils.ServerChanUtil;
 import com.ruoyi.fucktryee.utils.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import sun.net.util.IPAddressUtil;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -142,8 +147,11 @@ public class FuckChuangyiController {
     @ResponseBody
     public Result deleteUser(
             @RequestParam(value = "stuNumber", required = true) String stuNumber,
-            @RequestParam(value = "key", required = true) String key) {
+            @RequestParam(value = "key", required = true) String key,HttpServletRequest request) {
         System.out.println("进入删除用户控制器");
+        ServerChanUtil serverChanUtil = new ServerChanUtil();
+
+        String ip = IpUtils.getIpAddr(request);
         JSONObject jsonObject = new JSONObject();
         //判断key和学号是否正确
         if (!"".equals(stuNumber) && !"".equals(key)) {
@@ -153,8 +161,11 @@ public class FuckChuangyiController {
                 Integer result = userServices.deleteUserByStuNumberAndPassword(stuNumber, key);
                 jsonObject.put("user",auser.getStuNumber());
                 if (result > 0) {
+                    serverChanUtil.send("用户删除提醒","IP地址:" + ip + "||删除用户：" + auser.getStuNumber() + "-失败。");
                     return ResultUtil.success(ResultEnum.SUCCESS.code, jsonObject, "删除成功~");
+
                 } else {
+                    serverChanUtil.send("用户删除提醒","IP地址:" + ip + "||删除用户：" + auser.getStuNumber() + "-失败。");
                     return ResultUtil.fail(ResultEnum.FAIL.code, "删除失败，请检查学号和秘钥是否正确~");
                 }
             }

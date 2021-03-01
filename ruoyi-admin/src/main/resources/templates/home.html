@@ -20,9 +20,14 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <a class="navbar-brand" href="#">胖哈勃实验室</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
     <ul class="navbar-nav">
-        <li class="nav-item active">
+        <li class="nav-item">
             <a class="nav-link" href="/home">首页</a>
         </li>
         <li class="nav-item">
@@ -38,6 +43,7 @@
             <a class="nav-link" href="/signlog">停用账户</a>
         </li>
     </ul>
+    </div>
 </nav>
 <div class="jumbotron text-center">
     <img class="img-responsive center-block round_icon" src="http://cdn.pwnhub.net/images/pwnhub.jpg">
@@ -48,6 +54,8 @@
     <div class="badge badge-success" th:text="'站点状态：正常运行，注册开启状态：' + ${allowRegister}"></div>
     <br>
     <div class="badge badge-warning" th:text="'最后签到完成时间：' + ${lastSignDate}"></div>
+    <br>
+    <div class="badge badge-info" th:text="'您的IP地址：' + ${ipAddress}"></div>
 </div>
 <div class="col-md-8 offset-md-2">
     <h5 class="text-center">您可以点击上方的【开始使用】按钮登记一些必要信息即可完成注册</h5>

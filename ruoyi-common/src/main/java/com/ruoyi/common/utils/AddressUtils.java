@@ -41,9 +41,8 @@ public class AddressUtils
                     return UNKNOWN;
                 }
                 JSONObject obj = JSONObject.parseObject(rspStr);
-                String region = obj.getString("pro");
-                String city = obj.getString("city");
-                return String.format("%s %s", region, city);
+                String addr = obj.getString("addr");
+                return String.format("%s",addr);
             }
             catch (Exception e)
             {

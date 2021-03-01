@@ -44,8 +44,8 @@ public class GenCoordinateUtils {
         // 前缀经纬度
         int  prefixLat = 29, prefixLng = 121;
         // 经纬度小数的前6位
-        int front6Lat = GenNumberUtils.genRange(922766, 923861);
-        int front6Lng = GenNumberUtils.genRange(636459, 638442);
+        int front6Lat = GenNumberUtils.genRange(924900, 924953);
+        int front6Lng = GenNumberUtils.genRange(640700, 640719);
         // 经纬度小数的后6位。
         int back6Lat = GenNumberUtils.genRangeNot0(100001, 999999);
         int backLng = GenNumberUtils.genRangeNot0(100001, 999999);

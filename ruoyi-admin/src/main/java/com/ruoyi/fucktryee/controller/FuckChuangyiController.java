@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 import com.github.pagehelper.PageHelper;
+import com.ruoyi.common.utils.AddressUtils;
 import com.ruoyi.common.utils.IpUtils;
 import com.ruoyi.fucktryee.enums.ResultEnum;
 import com.ruoyi.fucktryee.pojo.Config;
@@ -52,7 +53,7 @@ public class FuckChuangyiController {
     SystemSettingServicesImpl settingServices;
 
     @RequestMapping(value = {"home"})
-    public ModelAndView home() {
+    public ModelAndView home(HttpServletRequest httpServletRequest) {
         //实例化一个ModelAndView
         ModelAndView mv = new ModelAndView("home");
         mv.setViewName("home");
@@ -67,7 +68,10 @@ public class FuckChuangyiController {
         mv.addObject("allowRegister", allowRegister);
         mv.addObject("platformUserNum", platformUserNum);
         mv.addObject("signCount", signCount);
-        mv.addObject("lastSignDate", lastSignDate.getLogDate());
+        SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss EE");
+        mv.addObject("lastSignDate", spf.format(lastSignDate.getLogDate()));
+        String ipAddress = IpUtils.getIpAddr(httpServletRequest);
+        mv.addObject("ipAddress",ipAddress +  "[" +  AddressUtils.getRealAddressByIP(ipAddress) + "]");
 
         return mv;
     }

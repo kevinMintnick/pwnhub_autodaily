@@ -1,10 +1,7 @@
 package com.ruoyi.fucktryee.utils;
 
 
-import com.ruoyi.fucktryee.pojo.Config;
-import com.ruoyi.fucktryee.pojo.Setting;
-import com.ruoyi.fucktryee.pojo.SignLog;
-import com.ruoyi.fucktryee.pojo.User;
+import com.ruoyi.fucktryee.pojo.*;
 
 import com.ruoyi.fucktryee.service.impl.TemperatureSignLogServicesImpl;
 import okhttp3.*;
@@ -68,20 +65,22 @@ public class RequestSignUtil {
         String[] address = user.getAddress().split("##");;
         //获取地址数量
         int addressCount = address.length;
-        //2020年11月26日22:33:58 定死经度 狗比创艺 不跟你玩了
-        Long fxxk = RandomUtil.getRandomForLongBounded2(100000000,999999999);
-//        String lat = "学府东苑".equals(areaType)?"29.923" + fxxk:"29.92231" + fxxk;
-//        //2020年11月26日22:34:30 定死纬度 狗比创艺 不跟你玩了
-//        String lng = "学府东苑".equals(areaType)?"121.627038" + fxxk:"121.640458" + fxxk;
         String lat;
         String lng;
-        String[] latlng = user.getLatlng().split(",");
-        if (!"".equals(latlng[0]) && !"".equals(latlng[1])){
-            lat = latlng[0] + fxxk;
-            lng = latlng[1] + fxxk;
+        if ("学府西苑".equals(areaType)){
+            //生成学府西苑的坐标
+            Coordinate coord = GenCoordinateUtils.getWestSignCoordinate();
+            lat = coord.getLat();
+            lng = coord.getLng();
+        }else if ("学府东苑".equals(areaType)){
+            //生成学府东苑的坐标
+            Coordinate coord = GenCoordinateUtils.getEastSignCoordinate();
+            lat = coord.getLat();
+            lng = coord.getLng();
         }else{
-            lat = "29.92231" + fxxk;
-            lng = "121.627038" + fxxk;
+            String[] latlng = user.getLatlng().split(",");
+            lat = latlng[0];
+            lng = latlng[1];
         }
         //TODO 处理经纬度
         //产生一个随机数用于抽取随机地址

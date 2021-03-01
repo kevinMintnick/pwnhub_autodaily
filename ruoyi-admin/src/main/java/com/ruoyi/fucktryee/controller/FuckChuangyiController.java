@@ -169,6 +169,7 @@ public class FuckChuangyiController {
                     return ResultUtil.fail(ResultEnum.FAIL.code, "删除失败，请检查学号和秘钥是否正确~");
                 }
             }
+            serverChanUtil.send("用户删除提醒","IP地址:" + ip + "||删除用户：" + stuNumber + "-失败。");
         }
         return ResultUtil.fail(ResultEnum.FAIL.code, "删除失败，请检查学号和秘钥是否正确~");
     }

@@ -79,7 +79,7 @@ public class RandomUtil {
     // 使用Apache Commons Lang3的工具类来生成有边界的Long(RandomUtils提供了对java.util.Random的补充)
     public static long getRandomForLongBounded3(long min, long max) {
         long longBounded = RandomUtils.nextLong(min, max);
-        System.out.println(longBounded);
+        //System.out.println(longBounded);
         return longBounded;
     }
 

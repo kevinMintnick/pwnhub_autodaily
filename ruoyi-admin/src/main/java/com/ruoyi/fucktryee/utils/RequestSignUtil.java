@@ -79,8 +79,8 @@ public class RequestSignUtil {
             lng = coord.getLng();
         }else{
             String[] latlng = user.getLatlng().split(",");
-            lat = latlng[0];
-            lng = latlng[1];
+            lat = latlng[0] + RandomUtil.getRandomForLongBounded2(100001,999999);
+            lng = latlng[1] + RandomUtil.getRandomForLongBounded2(100001,999999);;
         }
         //TODO 处理经纬度
         //产生一个随机数用于抽取随机地址

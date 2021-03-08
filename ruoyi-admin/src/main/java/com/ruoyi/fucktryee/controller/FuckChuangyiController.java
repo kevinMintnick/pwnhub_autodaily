@@ -70,7 +70,7 @@ public class FuckChuangyiController {
         mv.addObject("signCount", signCount);
         SimpleDateFormat spf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss EE");
         mv.addObject("lastSignDate", spf.format(lastSignDate.getLogDate()));
-        String ipAddress = IpUtils.getIpAddr(httpServletRequest);
+        String ipAddress = IpUtils.getIpAddr(httpServletRequest).replaceAll("\\s*|\t|\r|\n","");
         mv.addObject("ipAddress",ipAddress +  "[" +  AddressUtils.getRealAddressByIP(ipAddress) + "]");
 
         return mv;

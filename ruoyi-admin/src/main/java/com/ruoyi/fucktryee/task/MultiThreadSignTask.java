@@ -6,14 +6,8 @@ import com.ruoyi.fucktryee.commons.thread.ITask;
 import com.ruoyi.fucktryee.commons.thread.ResultBean;
 import com.ruoyi.fucktryee.dingtalk.TaskDinger;
 import com.ruoyi.fucktryee.enums.SignStatusEnum;
-import com.ruoyi.fucktryee.pojo.Config;
-import com.ruoyi.fucktryee.pojo.Setting;
-import com.ruoyi.fucktryee.pojo.SignLog;
-import com.ruoyi.fucktryee.pojo.User;
-import com.ruoyi.fucktryee.service.impl.SystemSettingServicesImpl;
-import com.ruoyi.fucktryee.service.impl.SystemUserServicesImpl;
-import com.ruoyi.fucktryee.service.impl.TemperatureSignLogServicesImpl;
-import com.ruoyi.fucktryee.service.impl.UserConfigServicesImpl;
+import com.ruoyi.fucktryee.pojo.*;
+import com.ruoyi.fucktryee.service.impl.*;
 import com.ruoyi.fucktryee.utils.*;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -54,6 +48,10 @@ public class MultiThreadSignTask implements InitializingBean {
     SystemSettingServicesImpl settingServices;
     @Resource
     private TaskDinger taskDinger;
+    @Resource
+    WeatherMessageServicesImpl weatherMessageServices;
+    @Resource
+    HitokotoMessageServicesImpl hitokotoMessageServices;
 
     Integer success = 0;
     ArrayList<Config> fail_sign_user = new ArrayList<>();
@@ -158,7 +156,24 @@ public class MultiThreadSignTask implements InitializingBean {
         }
         for (Config config : fail_sign_user) { failSignList = failSignList + config.getStuClass() + " " + config.getStuName() + " " + config.getStuNumber() + "\n\n"; }
         message = desp + failSignList;
+        message = message + "===========胖哈勃实验室 - 天气预报==========\n\n";
+        Weather weather = getWeather().get(0);
+        message = message + String.format("今天是%s(%s)，空气质量%s，天气情况为%s(%s)。%s\n\n",weather.getDate(),weather.getWeek(),weather.getAirLevel(),weather.getWea(),weather.getTem(),weather.getAirTips());
+        message = message + "===========胖哈勃实验室 - 一言==========\n\n";
+        Hitokoto hitokoto = getHitokoto();
+        message = message + String.format("『%s』——%s",hitokoto.getHitokoto(),hitokoto.getFrom());
+        message = message.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
         return message;
+    }
+
+    private List<Weather> getWeather(){
+        List<Weather> weathers = weatherMessageServices.getWeather();
+        return weathers;
+    }
+
+    private Hitokoto getHitokoto(){
+        Hitokoto hitokoto = hitokotoMessageServices.getHitokoto();
+        return hitokoto;
     }
 
 

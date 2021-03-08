@@ -5,6 +5,7 @@ import com.jaemon.dingtalk.entity.DingTalkResult;
 import com.ruoyi.fucktryee.commons.thread.ITask;
 import com.ruoyi.fucktryee.commons.thread.ResultBean;
 import com.ruoyi.fucktryee.dingtalk.TaskDinger;
+import com.ruoyi.fucktryee.enums.SignStatusEnum;
 import com.ruoyi.fucktryee.pojo.Config;
 import com.ruoyi.fucktryee.pojo.Setting;
 import com.ruoyi.fucktryee.pojo.SignLog;
@@ -91,24 +92,10 @@ public class MultiThreadSignTask implements InitializingBean {
                 //输出签到结果
                 logger.info("签到结果：学号：{}，姓名：{}，本次签到状态：{}。",auser.getStuNumber(),config.getStuName(),response);
                 //TODO 判断是否需要重签
-                if (!response.contains("签到成功") && !response.contains("您已签到") && !response.contains("当前非签到时间,无法签到!")){
-                    //TODO 尝试重签八次
-                    for (int i = 1; i <= 5; i++) {
-                        Thread.sleep(500);
-                        logger.info("开始对学号：{}，姓名：{}，进行第{}次重签操作。",auser.getStuNumber(),config.getStuName(),i);
-                        String result = RequestSignUtil.doPostTemperatureSign(auser, config,encrypt.getSettingValue());
-                        logger.info("{}第{}次签到结果：{}",config.getStuName(),i,result);
-                        if (result.contains("您已签到")||result.contains("签到成功")){
-                            userServices.updateLastSignStatus(1,auser.getStuNumber());
-                            success++;
-                            break;
-                        }
-                        if (i==5){
-                            //将签到失败的用户加入到List用于发信
-                            fail_sign_user.add(config);
-                            userServices.updateLastSignStatus(0,auser.getStuNumber());
-                        }
-                    }
+                if (!response.contains(SignStatusEnum.SIGNED_SUCCESSFUL.status) && !response.contains(SignStatusEnum.SIGNED_IN.status)
+                        && !response.contains(SignStatusEnum.NOT_IN_THE_CHECK_IN_TIME_RANGE.status)){
+                    //TODO 尝试重签五次
+                    resign(auser,config,encrypt);
                 }else{
                     success++;
                     userServices.updateLastSignStatus(1,auser.getStuNumber());
@@ -116,28 +103,53 @@ public class MultiThreadSignTask implements InitializingBean {
                 //更新最后签到日期
                 userServices.updateLastSignDate(auser.getStuNumber());
                 ResultBean<Object> resultBean = ResultBean.newInstance();
-                resultBean.setData(response.toString());
+                resultBean.setData(response);
 
                 //随机延迟
                 int sleepRandom = RandomUtil.getRandomForIntegerBounded3(1000,5000);
-                logger.info("随机延迟:{}",sleepRandom);
+                logger.info("签到随机延迟:{}ms",sleepRandom);
                 Thread.sleep(sleepRandom);
                 return resultBean;
             }
         });
-        logger.info("签到完成!");
-        //根据不同的时间段查询不同的数据
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-
-        ServerChanUtil serverChanUtil = new ServerChanUtil();
-        DingTalkResult dingTalkResult;
-
-        //System.out.println("result:" + result);
+        logger.info("多线程任务签到完成!");
         logger.info("success:{}",success);
+        //发信
+        String message = handleMessageData(signUser);
+        sendDingTalkMessage(message);
+        sendServerChanMessage(message);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+
+    }
+
+    private void resign(User auser,Config config,Setting encrypt) throws InterruptedException, IOException, ParseException {
+        for (int i = 1; i <= 5; i++) {
+            Thread.sleep(500);
+            logger.info("开始对学号：{}，姓名：{}，进行第{}次重签操作。",auser.getStuNumber(),config.getStuName(),i);
+            String result = RequestSignUtil.doPostTemperatureSign(auser, config,encrypt.getSettingValue());
+            logger.info("{}第{}次签到结果：{}",config.getStuName(),i,result);
+            if (result.contains(SignStatusEnum.SIGNED_IN.status)||result.contains(SignStatusEnum.SIGNED_SUCCESSFUL.status)){
+                userServices.updateLastSignStatus(1,auser.getStuNumber());
+                success++;
+                break;
+            }
+            if (i==5){
+                //将签到失败的用户加入到List用于发信
+                fail_sign_user.add(config);
+                userServices.updateLastSignStatus(0,auser.getStuNumber());
+            }
+        }
+    }
+
+    private String handleMessageData(List<User>signUser){
         /**
          * (2020年12月5日21:22:43)总计为83个用户执行签到，成功签到82个用户，失败签到1个用户。\n\n============失败签到名单==============\n\n班级：               姓名：\n\n18移动1 张三\n\n18移动2 李四
          */
+        String message;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String desp = String.format("（%s）总计为%s个用户执行签到，成功签到%d个用户，失败签到%d个用户。\n\n",sdf.format(new Date()),signUser.size(),success,signUser.size()-success);
         String failSignList="";
         if (signUser.size()!=success) {
@@ -145,16 +157,21 @@ public class MultiThreadSignTask implements InitializingBean {
             failSignList = failSignList + "班级  姓名  学号\n\n";
         }
         for (Config config : fail_sign_user) { failSignList = failSignList + config.getStuClass() + " " + config.getStuName() + " " + config.getStuNumber() + "\n\n"; }
-        //发信(Server酱)
-        serverChanUtil.send("体温签到平台消息通知",desp + failSignList);
-        //发信(钉钉机器人)
-        dingTalkResult = taskDinger.taskSuccess(desp + failSignList);
-        logger.info("钉钉机器人回调信息：{}",JSON.toJSONString(dingTalkResult));
-
+        message = desp + failSignList;
+        return message;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
 
+    private void sendDingTalkMessage(String message){
+        DingTalkResult dingTalkResult;
+        //发信(钉钉机器人)
+        dingTalkResult = taskDinger.taskSuccess(message);
+        logger.info("钉钉机器人回调信息：{}",JSON.toJSONString(dingTalkResult));
+    }
+
+    private void sendServerChanMessage(String message){
+        ServerChanUtil serverChanUtil = new ServerChanUtil();
+        //发信(Server酱)
+        serverChanUtil.send("体温签到平台消息通知",message);
     }
 }

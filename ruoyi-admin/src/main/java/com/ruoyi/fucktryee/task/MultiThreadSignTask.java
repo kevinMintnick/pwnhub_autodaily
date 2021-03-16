@@ -1,34 +1,24 @@
 package com.ruoyi.fucktryee.task;
 
+import cn.hutool.system.SystemUtil;
 import com.alibaba.fastjson.JSON;
 import com.jaemon.dingtalk.entity.DingTalkResult;
-import com.ruoyi.fucktryee.commons.thread.ITask;
 import com.ruoyi.fucktryee.commons.thread.ResultBean;
 import com.ruoyi.fucktryee.dingtalk.TaskDinger;
 import com.ruoyi.fucktryee.enums.SignStatusEnum;
 import com.ruoyi.fucktryee.pojo.*;
 import com.ruoyi.fucktryee.service.impl.*;
 import com.ruoyi.fucktryee.utils.*;
-import org.apache.commons.lang3.time.StopWatch;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import org.apache.commons.lang.time.DurationFormatUtils;
 
 /**
  * 试验性功能：多线程处理签到任务
@@ -38,7 +28,7 @@ import org.apache.commons.lang.time.DurationFormatUtils;
 @Component("multiThreadSignTask")
 public class MultiThreadSignTask implements InitializingBean {
 
-    private static Logger logger = LoggerFactory.getLogger(MultiThreadSignTask.class);
+    private static final Logger logger = LoggerFactory.getLogger(MultiThreadSignTask.class);
 
     @Resource
     SystemUserServicesImpl userServices;
@@ -56,14 +46,14 @@ public class MultiThreadSignTask implements InitializingBean {
     HitokotoMessageServicesImpl hitokotoMessageServices;
 
     Integer success = 0;
-    ArrayList<Config> fail_sign_user = new ArrayList<>();
+    ArrayList<Config> failSignUserList = new ArrayList<>();
 
-    public void task() throws IOException, InterruptedException, ParseException {
+    public void task() throws Exception {
         // 开始时间（ms）
         long l = System.currentTimeMillis();
 
         //重置List和success
-        fail_sign_user.clear();
+        failSignUserList.clear();
         success = 0;
 
         //获取加密秘钥
@@ -83,37 +73,34 @@ public class MultiThreadSignTask implements InitializingBean {
         // 辅助参数
         Map<String, Object> params = new HashMap<>(9);
 
-        ResultBean<List<ResultBean<Object>>> resultBean = threadUtils.execute(signUser, params, new  ITask<ResultBean<Object>, User>(){
-            @Override
-            public ResultBean<Object> execute(User auser, Map<String, Object> params) throws IOException, ParseException, InterruptedException {
-                /**
-                 * 具体业务逻辑：签到
-                 */
-                Config config = configServices.selectConfig(auser.getStuNumber());
-                if ("".equals(config.getStuToken()) || config.getStuToken()==null){ config.setStuToken("outl5w4BlI5n8XMDBUHM3Jb4iD_A"); }
-                String response = RequestSignUtil.doPostTemperatureSign(auser, config,encrypt.getSettingValue());
-                //输出签到结果
-                logger.info("签到结果：学号：{}，姓名：{}，本次签到状态：{}。",auser.getStuNumber(),config.getStuName(),response);
-                //TODO 判断是否需要重签
-                if (!response.contains(SignStatusEnum.SIGNED_SUCCESSFUL.status) && !response.contains(SignStatusEnum.SIGNED_IN.status)
-                        && !response.contains(SignStatusEnum.NOT_IN_THE_CHECK_IN_TIME_RANGE.status)){
-                    //TODO 尝试重签五次
-                    resign(auser,config,encrypt);
-                }else{
-                    success++;
-                    userServices.updateLastSignStatus(1,auser.getStuNumber());
-                }
-                //更新最后签到日期
-                userServices.updateLastSignDate(auser.getStuNumber());
-                ResultBean<Object> resultBean = ResultBean.newInstance();
-                resultBean.setData(response);
-
-                //随机延迟
-                int sleepRandom = RandomUtil.getRandomForIntegerBounded3(1000,5000);
-                logger.info("签到随机延迟:{}ms",sleepRandom);
-                Thread.sleep(sleepRandom);
-                return resultBean;
+        threadUtils.execute(signUser, params, (auser, params1) -> {
+            /**
+             * 具体业务逻辑：签到
+             */
+            Config config = configServices.selectConfig(auser.getStuNumber());
+            if ("".equals(config.getStuToken()) || config.getStuToken()==null){ config.setStuToken("outl5w4BlI5n8XMDBUHM3Jb4iD_A"); }
+            String response = RequestSignUtil.doPostTemperatureSign(auser, config,encrypt.getSettingValue());
+            //输出签到结果
+            logger.info("签到结果：学号：{}，姓名：{}，本次签到状态：{}。",auser.getStuNumber(),config.getStuName(),response);
+            //TODO 判断是否需要重签
+            if (!response.contains(SignStatusEnum.SIGNED_SUCCESSFUL.status) && !response.contains(SignStatusEnum.SIGNED_IN.status)
+                    && !response.contains(SignStatusEnum.NOT_IN_THE_CHECK_IN_TIME_RANGE.status)){
+                //TODO 尝试重签五次
+                resign(auser,config,encrypt);
+            }else{
+                success++;
+                userServices.updateLastSignStatus(1,auser.getStuNumber());
             }
+            //更新最后签到日期
+            userServices.updateLastSignDate(auser.getStuNumber());
+            ResultBean<Object> resultBean1 = ResultBean.newInstance();
+            resultBean1.setData(response);
+
+            //随机延迟
+            int sleepRandom = RandomUtil.getRandomForIntegerBounded3(1000,5000);
+            logger.info("签到随机延迟:{}ms",sleepRandom);
+            Thread.sleep(sleepRandom);
+            return resultBean1;
         });
         logger.info("多线程任务签到完成!");
         logger.info("success:{}",success);
@@ -144,13 +131,13 @@ public class MultiThreadSignTask implements InitializingBean {
             }
             if (i==5){
                 //将签到失败的用户加入到List用于发信
-                fail_sign_user.add(config);
+                failSignUserList.add(config);
                 userServices.updateLastSignStatus(0,auser.getStuNumber());
             }
         }
     }
 
-    private String handleMessageData(List<User> signUser,Long taskTime){
+    private String handleMessageData(List<User> signUser,Long taskTime) throws Exception {
         /**
          * (2020年12月5日21:22:43)总计为83个用户执行签到，成功签到82个用户，失败签到1个用户。\n\n============失败签到名单==============\n\n班级：               姓名：\n\n18移动1 张三\n\n18移动2 李四
          */
@@ -162,7 +149,7 @@ public class MultiThreadSignTask implements InitializingBean {
             failSignList = new StringBuilder("========失败签到名单========\n\n");
             failSignList.append("班级  姓名  学号\n\n");
         }
-        for (Config config : fail_sign_user) { failSignList.append(config.getStuClass()).append(" ").append(config.getStuName()).append(" ").append(config.getStuNumber()).append("\n\n"); }
+        for (Config config : failSignUserList) { failSignList.append(config.getStuClass()).append(" ").append(config.getStuName()).append(" ").append(config.getStuNumber()).append("\n\n"); }
         message = message +  desp + failSignList;
         message = message + "=====胖哈勃实验室 - 天气预报=====\n\n";
         Weather weather = getWeather().get(0);
@@ -171,7 +158,32 @@ public class MultiThreadSignTask implements InitializingBean {
         Hitokoto hitokoto = getHitokoto();
         message = message + String.format("『%s』——%s\n\n",hitokoto.getHitokoto(),hitokoto.getFrom());
         message = message + "=====胖哈勃实验室 - 性能分析=====\n\n";
-        message = message + String.format("签到总耗时：%dms",taskTime);
+        message = message + String.format("签到总耗时：%dms\n\n",taskTime);
+        //获取系统信息
+//        Server server = new Server();
+//        server.copyTo();
+//        message = message + String.format("操作系统：%s\n\n",server.getSys().getOsName());
+//        message = message + String.format("系统架构：%s\n\n",server.getSys().getOsArch());
+//        message = message + String.format("服务器IP：%s\n\n",server.getSys().getComputerIp());
+//        //内存
+//        message = message + String.format("总内存：%sGB\n\n",server.getMem().getTotal());
+//        message = message + String.format("空闲内存：%sGB\n\n",server.getMem().getFree());
+//        message = message + String.format("已用内存：%sGB\n\n",server.getMem().getUsed());
+//        message = message + String.format("使用率：%s%%\n\n",server.getMem().getUsage());
+//        //CPU
+////        message = message + String.format("CPU核心数：%s\n\n", server.getCpu().getCpuNum());
+////        message = message + String.format("用户使用率：%s%%\n\n",server.getCpu().getUsed());
+////        message = message + String.format("系统使用率：%s%%\n\n",server.getCpu().getSys());
+////        message = message + String.format("当前空闲率：%s%%\n\n",server.getCpu().getFree());
+//        //Java虚拟机信息
+//        message = message + String.format("Java名称：%s\n\n",server.getJvm().getName());
+//        message = message + String.format("Java版本：%s\n\n",server.getJvm().getVersion());
+//        message = message + String.format("启动时间：%s\n\n",server.getJvm().getStartTime());
+//        message = message + String.format("运行时长：%s\n\n",server.getJvm().getRunTime());
+//        message = message + String.format("JDK安装路径：%s\n\n",server.getJvm().getHome());
+//        message = message + String.format("项目路径：%s\n\n",server.getSys().getUserDir());
+
+        message = message + SystemUtil.getRuntimeInfo();
         message = message.replaceAll("(?m)^\\s*$(\\n|\\r\\n)", "");
         return message;
     }

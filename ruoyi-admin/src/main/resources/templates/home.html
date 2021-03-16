@@ -19,7 +19,7 @@
         }
         .jumbotron {
             margin-bottom: 0px;
-            background-image: url(http://cdn.pwnhub.net/image/wallhaven-rddgwm.jpg);
+            background-image: url(https://w.wallhaven.cc/full/6k/wallhaven-6k7jxw.jpg);
             background-position: 0% 25%;
             background-size: cover;
             background-repeat: no-repeat;
@@ -53,9 +53,10 @@
     </div>
 </nav>
 <div class="jumbotron text-center jumbotron-fluid">
-    <img class="img-responsive center-block round_icon" src="http://cdn.pwnhub.net/images/pwnhub.jpg">
+    <img class="img-responsive center-block round_icon" src="https://s3.ax1x.com/2021/03/09/63nupn.jpg">
     <h1 style="color: white">胖哈勃实验室</h1>
-    <p style="color: white">体温自动签到自助系统4.2(多线程、重签、高德定位测试版)</p>
+    <p style="color: white">体温自动签到自助系统 version4.2<br>(多线程、重签、高德定位测试版)</p>
+    <div class="badge badge-primary" th:text="'本站用户数：' + ${platformUserNum} + '人'"></div>
     <div class="badge badge-primary" th:text="'本站已经累计签到' + ${signCount} + '次（包含重试次数）'"></div>
     <br>
     <div class="badge badge-success" th:text="'站点状态：正常运行，注册开启状态：' + ${allowRegister}"></div>

@@ -15,10 +15,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="lastSignStatus"    column="last_sign_status"    />
         <result property="enabled"    column="enabled"    />
         <result property="createDate"    column="createDate"    />
+        <result property="stuName"    column="stuName"    />
+        <result property="stuSystemId"    column="stuSystemId"    />
+        <result property="stuClass"    column="stuClass"    />
     </resultMap>
 
     <sql id="selectSignUserVo">
-        select platform_id, stu_number, platform_key, areaType, address, latlng, last_sign_date, last_sign_status, enabled, createDate from sign_user
+        SELECT distinct sign_user.platform_id,sign_user.stu_number,sign_user.platform_key,sign_user.areaType,sign_user.address,sign_user.latlng,sign_user.last_sign_date,sign_user.last_sign_status,sign_user.enabled,sign_user.createDate,sign_config.stuName,
+        sign_config.stuSystemId,sign_config.stuClass
+        FROM sign_user
+        LEFT JOIN sign_config
+        ON sign_user.stu_number = sign_config.stuNumber
+        ORDER BY sign_user.platform_id
     </sql>
 
     <select id="selectSignUserList" parameterType="SignUser" resultMap="SignUserResult">
@@ -33,6 +41,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="lastSignStatus != null "> and last_sign_status = #{lastSignStatus}</if>
             <if test="enabled != null "> and enabled = #{enabled}</if>
             <if test="createDate != null "> and createDate = #{createDate}</if>
+            <if test="stuName != null "> and stuName = #{stuName}</if>
+            <if test="stuSystemId != null "> and stuSystemId = #{stuSystemId}</if>
         </where>
     </select>
     

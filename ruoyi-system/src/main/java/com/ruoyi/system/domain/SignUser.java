@@ -53,10 +53,46 @@ public class SignUser extends BaseEntity
     @Excel(name = "是否启用")
     private Long enabled;
 
+    /** 学生姓名 */
+    @Excel(name = "学生姓名")
+    private String stuName;
+
+    /** 创艺ID */
+    @Excel(name = "创艺ID")
+    private String stuSystemId;
+
+    /** 创艺ID */
+    @Excel(name = "学生班级")
+    private String stuClass;
+
     /** 注册日期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Excel(name = "注册日期", width = 30, dateFormat = "yyyy-MM-dd")
     private Date createDate;
+
+    public String getStuClass() {
+        return stuClass;
+    }
+
+    public void setStuClass(String stuClass) {
+        this.stuClass = stuClass;
+    }
+
+    public String getStuName() {
+        return stuName;
+    }
+
+    public void setStuName(String stuName) {
+        this.stuName = stuName;
+    }
+
+    public String getStuSystemId() {
+        return stuSystemId;
+    }
+
+    public void setStuSystemId(String stuSystemId) {
+        this.stuSystemId = stuSystemId;
+    }
 
     public void setPlatformId(Long platformId) 
     {

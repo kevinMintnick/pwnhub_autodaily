@@ -114,6 +114,11 @@
             <artifactId>dingtalk-spring-boot-starter</artifactId>
             <version>3.1.1-RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.5.8</version>
+        </dependency>
 
 
     </dependencies>
